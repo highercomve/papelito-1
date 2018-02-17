@@ -41,4 +41,22 @@ defmodule Papelito.Model.GameTest do
 
   end
 
+  test "Winner" do
+
+    team_one_a = %Team{name: "t_one", players: [], score: 10}
+    team_two_a = %Team{name: "t_two", players: [], score: 15}
+    game_a = %Game{subject: "Phrases", papers: [], teams: [team_one_a, team_two_a]}
+
+    assert Game.winner(game_a) == [team_two_a]
+
+    # Tie
+
+    team_one_b = %Team{name: "t_one", players: [], score: 10}
+    team_two_b = %Team{name: "t_two", players: [], score: 15}
+    team_three_b = %Team{name: "t_three", players: [], score: 15}
+    game_b = %Game{subject: "Phrases", papers: [], teams: [team_one_b, team_two_b, team_three_b]}
+
+    assert  Game.winner(game_b) == [team_two_b, team_three_b]
+  end
+
 end

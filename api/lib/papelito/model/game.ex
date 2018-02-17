@@ -31,5 +31,10 @@ defmodule Papelito.Model.Game do
     %Game{ game | teams: teams}
   end
 
+  @spec winner(Game.t()) :: Team.t()
+  def winner(%Game{} = game) do
+    max_score = Enum.map(game.teams, fn(team) -> team.score end) |> Enum.max
+    winners = Enum.filter(game.teams, fn(team) -> team.score == max_score end)
+  end
 
 end
