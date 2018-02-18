@@ -18,6 +18,16 @@ defmodule Papelito.Model.GameTest do
     game = Game.add_team(game, team_one_name)
 
     assert Enum.member?(game.teams, team_one)
+
+
+    team_two = %Team{name: "t_two", players: [], score: 0}
+    team_three = %Team{name: "t_3", players: [], score: 0}
+    game = Game.add_team(game, ["t_two", "t_3"])
+
+    assert length(game.teams) == 3
+    assert Enum.member?(game.teams, team_two)
+    assert Enum.member?(game.teams, team_three)
+
   end
 
   test "Add point to a specific team" do
@@ -57,6 +67,22 @@ defmodule Papelito.Model.GameTest do
     game_b = %Game{subject: "Phrases", papers: [], teams: [team_one_b, team_two_b, team_three_b]}
 
     assert  Game.winner(game_b) == [team_two_b, team_three_b]
+  end
+
+  test "Add papers" do
+    one = "JK Simmons"
+    two = "Fracisco de Miranda"
+    three = "Elon Musk"
+
+    team_one = %Team{name: "t_one", players: [], score: 0}
+    team_two = %Team{name: "t_two", players: [], score: 0}
+    game = %Game{subject: "Characters", teams: [team_one, team_two], papers: [] }
+
+    game = Game.add_paper(game, one)
+    assert game.papers == [one]
+
+    game = Game.add_paper(game, [two, three])
+    assert game.papers == [one, two, three]
   end
 
 end
