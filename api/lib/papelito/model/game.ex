@@ -29,7 +29,6 @@ defmodule Papelito.Model.Game do
     %Game{ game | teams: teams }
   end
 
-
   @spec add_point_to_team(Game.t(), String.t()) :: Game.t()
   def add_point_to_team(%Game{} = game, team_name) do
     team = Enum.find(game.teams, fn(team) -> team.name == team_name end)

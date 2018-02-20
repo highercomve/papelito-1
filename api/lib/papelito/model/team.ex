@@ -4,7 +4,6 @@ defmodule Papelito.Model.Team do
 
   defstruct players: [], score: 0, name: ""
 
-
   @type t :: %__MODULE__{
     players: [String.t()],
     name: String.t(),

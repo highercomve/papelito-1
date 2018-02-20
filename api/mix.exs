@@ -38,7 +38,8 @@ defmodule Papelito.Mixfile do
       {:phoenix_ecto, "~> 3.2"},
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"}
+      {:cowboy, "~> 1.0"},
+      {:haikunator, git: "https://github.com/gusga/haikunator"}
     ]
   end
 

@@ -2,68 +2,84 @@ defmodule Papelito.Server.Game do
 
   use GenServer
 
-  alias Papelito.Model.Game
+  alias Papelito.Model.Game, as: GameData
   alias Papelito.Model.Team
 
-  def start_link(game_id) do
-    GenServer.start_link()
+  defstruct game: %GameData{},
+            current_paper: "",
+            previous_papers: [],
+            round: 0,
+            started: false,
+            current_team: ""
+
+
+  def start_link([slug, subject]) do
+    name = via_tuple(slug)
+    GenServer.start_link(__MODULE__, [slug, subject], name: name)
   end
 
-  def init([game_id]) do
-    state = %{}
+  defp via_tuple(slug) do
+    {:via, Registry, {:game_registry, slug}}
+  end
+
+  def init([slug, subject]) do
+    state = %__MODULE__{
+      game: GameData.create(subject)
+    }
     {:ok, state}
   end
 
+  ##------------------##
+  ##    Client API    ##
+  ##------------------##
 
-  def add_team(team_name) do
+  def add_team(slug, team_name) do
+    GenServer.call(via_tuple(slug), {:add_team, team_name})
   end
 
-  def add_player(team, player) do
+  def add_player(slug, team_name, player) do
+    GenServer.call(via_tuple(slug), {:add_player, team_name, player})
   end
 
-  def add_game_subject(subject) do
+  def add_paper(slug, paper) do
+    GenServer.call(via_tuple(slug), {:add_paper, paper})
   end
 
-  def add_data(data) do
+  def start_round(slug) do
+    GenServer.call(via_tuple(slug), :next_round)
   end
 
-  def start_round() do
+  def next_round(slug) do
+    GenServer.call(via_tuple(slug), :next_round)
   end
 
+  ##------------------##
+  ##    Server API    ##
+  ##------------------##
 
   def handle_call({:add_team, team_name}, _from, state) do
-
-    {:reply, :ok, %{}}
+    game = GameData.add_data(game, team_name)
+    new_state = %__MODULE__{ state | game: game }
+    {:reply, :ok, new_state}
   end
 
-  def handle_call() do
+  def handle_call(:next_round, _from, state) do
+    next_round = state.round + 1
+    new_state = %__MODULE__{ state | round: next_round}
+    {:reply, next_round, new_state}
   end
 
-  def handle_call() do
+  def handle_call({:add_paper, paper}, _from, state) do
+    game = GameData.add_paper(state.game, paper)
+    {:reply, paper, %__MODULE__{ state | game: game}}
   end
 
-  def handle_call() do
-  end
-
-  def handle_call() do
-  end
-
-  def handle_cast() do
-  end
-
-  def handle_cast() do
+  def handle_call({:add_player, team, player}) do
   end
 
   def handle_cast() do
   end
-
-  def handle_cast() do
-  end
-
 
   def handle_info() do
   end
-
-
-
 end
