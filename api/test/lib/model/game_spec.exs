@@ -50,7 +50,6 @@ defmodule Papelito.Model.GameTest do
     team_two_a = %Team{name: "t_two", players: [], score: 15}
     teams = %{"t_one" => team_one_a, "t_two" => team_two_a}
     game_a = %Game{subject: "Phrases", papers: [], teams: teams}
-
     assert Game.winner(game_a) == [team_two_a]
 
     # Tie

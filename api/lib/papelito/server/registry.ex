@@ -1,6 +1,6 @@
 defmodule Papelito.Server.Registry do
 
-  use GenSserver
+  use GenServer
 
   ##---------##
   ##         ##
@@ -31,7 +31,7 @@ defmodule Papelito.Server.Registry do
       :undefined ->
         {:badarg, {game_name, message}}
 
-      pid - >
+      pid ->
         # Send message
         # investigate to send a messages using a GenServer instead Kernel.send
         pid
@@ -59,7 +59,7 @@ defmodule Papelito.Server.Registry do
     end
   end
 
-  def handle_cast({:unregister_name, game_names}, state) do
+  def handle_cast({:unregister_name, game_name}, state) do
     {:noreply, Map.delete(state, game_name)}
   end
 

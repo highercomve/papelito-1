@@ -2,6 +2,8 @@ defmodule Papelito.Server.Game do
 
   use GenServer
 
+  @max_rounds 3
+
   alias Papelito.Model.Game, as: GameData
   alias Papelito.Model.Team
 
@@ -58,13 +60,13 @@ defmodule Papelito.Server.Game do
   ##------------------##
 
   def handle_call({:add_team, team_name}, _from, state) do
-    game = GameData.add_data(game, team_name)
+    game = GameData.add_team(state.game, team_name)
     new_state = %__MODULE__{ state | game: game }
     {:reply, :ok, new_state}
   end
 
   def handle_call(:next_round, _from, state) do
-    next_round = state.round + 1
+    next_round = rem(state.round + 1, @max_rounds + 1)
     new_state = %__MODULE__{ state | round: next_round}
     {:reply, next_round, new_state}
   end
@@ -74,7 +76,11 @@ defmodule Papelito.Server.Game do
     {:reply, paper, %__MODULE__{ state | game: game}}
   end
 
-  def handle_call({:add_player, team, player}) do
+  def handle_call({:add_player, team_name, player}, _from, state) do
+    team = Team.add_player(state.game.teams[team_name], player)
+    teams = Map.put(state.game.teams, team_name, team)
+    game = %GameData{ state.game | teams: teams }
+    {:reply, team, %__MODULE__{ state | game: game }}
   end
 
   def handle_cast() do
