@@ -37,8 +37,8 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :papelito, Papelito.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
+  username: "papelito",
+  password: "papelito",
   database: "papelito_dev",
   hostname: "localhost",
   pool_size: 10
