@@ -1,5 +1,4 @@
 defmodule Papelito.Model.Team do
-
   alias __MODULE__
 
   defstruct players: [], score: 0, name: ""

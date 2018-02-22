@@ -2,7 +2,7 @@ defmodule Papelito.Model.Game do
   alias __MODULE__
   alias Papelito.Model.Team
 
-  defstruct subject: "", teams: [], papers: []
+  defstruct subject: "", teams: %{}, papers: []
 
   @type t :: %__MODULE__{
     subject: String.t(),
@@ -12,35 +12,36 @@ defmodule Papelito.Model.Game do
 
   @spec create(String.t()) :: Game.t()
   def create(subject) do
-    %Game{
-      subject: Papelito.Utils.Sanitizer.clean(subject)
-    }
+    %Game{ subject: Papelito.Utils.Sanitizer.clean(subject) }
   end
 
   @spec add_team(Game.t(), String.t()) :: Game.t()
   def add_team(%Game{} = game, team_name) when is_binary(team_name) do
-    new_team = Team.create(team_name)
-    %Game{ game | teams: [new_team | game.teams] }
+    name = sanitize_team_name(team_name)
+    teams = Map.put(game.teams, name, Team.create(team_name))
+    %Game{ game | teams: teams }
   end
 
   @spec add_team(Game.t(), Enumerable.t()) :: Game.t()
   def add_team(%Game{} = game, teams_name) when is_list(teams_name) do
-    teams = Enum.map(teams_name, &Team.create/1) |> Enum.into(game.teams)
+    teams = Enum.map(teams_name, fn(team_name) ->
+      {sanitize_team_name(team_name), Team.create(team_name)} end)
+      |> Map.new |> Map.merge(game.teams)
     %Game{ game | teams: teams }
   end
 
   @spec add_point_to_team(Game.t(), String.t()) :: Game.t()
   def add_point_to_team(%Game{} = game, team_name) do
-    team = Enum.find(game.teams, fn(team) -> team.name == team_name end)
-    teams = List.delete(game.teams, team)
-            |> List.insert_at(-1, Team.add_point(team))
+    team = Team.add_point(game.teams[team_name])
+    teams = Map.put(game.teams, team_name, team)
     %Game{ game | teams: teams }
   end
 
   @spec winner(Game.t()) :: Team.t()
   def winner(%Game{} = game) do
-    max_score = Enum.map(game.teams, fn(team) -> team.score end) |> Enum.max
-    winners = Enum.filter(game.teams, fn(team) -> team.score == max_score end)
+    teams = Map.values(game.teams)
+    max_score = Enum.map(teams, fn(team) -> team.score end) |> Enum.max
+    Enum.filter(teams, fn(team) -> team.score == max_score end)
   end
 
   @spec add_paper(Game.t(), String.t()) :: Game.t()
@@ -52,4 +53,14 @@ defmodule Papelito.Model.Game do
   def add_paper(%Game{} = game, papers) when is_list(papers) do
     %Game{ game | papers: Enum.into(papers, game.papers) }
   end
+
+  ##-------------------##
+  ## Helpers functions ##
+  ##-------------------##
+
+  @spec sanitize_team_name(String.t()) :: String.t()
+  def sanitize_team_name(name) do
+    Papelito.Utils.Sanitizer.clean(name)
+  end
+
 end
