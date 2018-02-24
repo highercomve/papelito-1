@@ -5,13 +5,13 @@ defmodule Papelito.Model.GameTest do
   alias Papelito.Model.Team
 
   test "Create game" do
-    game = %Game{subject: "phrases", papers: [], teams: %{}}
+    game = %Game{subject: "Phrases", papers: [], teams: %{}}
 
     assert Game.create("Phrases") == game
   end
 
   test "Add team" do
-    game = %Game{subject: "phrases", papers: [], teams: %{}}
+    game = %Game{subject: "Phrases", papers: [], teams: %{}}
     team_one_name = "team_one"
     team_one = %Team{name: team_one_name, players: [], score: 0}
 
