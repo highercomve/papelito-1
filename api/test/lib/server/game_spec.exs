@@ -8,7 +8,6 @@ defmodule Papelito.Server.GameTest do
     {:ok, state} = Papelito.Server.Game.init(["Rock Bands"])
     assert state.game.subject == "Rock Bands"
     assert state.round == 0
-    assert state.started == false
     assert is_nil(state.current_paper)
   end
 
@@ -16,18 +15,37 @@ defmodule Papelito.Server.GameTest do
     {:ok, state} = Papelito.Server.Game.init(["Rock Bands"])
     {:reply, :ok, new_state} = Papelito.Server.Game.handle_call(:start, nil, state)
     assert new_state.round == 1
-    assert new_state.started == true
+  end
+
+  test "Next team" do
+    game_state = %GameServer{ teams_order: ["team_two", "team_one", "team_three"] }
+
+    {:reply, team, new_state} = Papelito.Server.Game.handle_call(:next_team, nil, game_state)
+    assert team == "team_two"
+    assert new_state.current_team == "team_two"
+
+    {:reply, team, new_x2_state} = Papelito.Server.Game.handle_call(:next_team, nil, new_state)
+    assert team == "team_one"
+    assert new_x2_state.current_team == "team_one"
+
+    {:reply, team, new_x3_state} = Papelito.Server.Game.handle_call(:next_team, nil, new_x2_state)
+    assert team == "team_three"
+    assert new_x3_state.current_team == "team_three"
+
+    {:reply, team, new_x4_state} = Papelito.Server.Game.handle_call(:next_team, nil, new_x3_state)
+    assert team == "team_two"
+    assert new_x4_state.current_team == "team_two"
   end
 
   test "Add Team" do
     game_state = %GameServer{}
     team_one = %Team{ name: "team_one", players: [], score: 0}
 
-    {:reply, :ok, new_state} = Papelito.Server.Game.handle_call({:add_team, "team_one"}, nil, game_state)
+    {:noreply, new_state} = Papelito.Server.Game.handle_cast({:add_team, "team_one"}, game_state)
     assert new_state.game.teams["team_one"] == team_one
 
     team_two = %Team{ name: "team_two", players: [], score: 0}
-    {:reply, :ok, new_new_state} = Papelito.Server.Game.handle_call({:add_team, "team_two"}, nil, new_state)
+    {:noreply, new_new_state} = Papelito.Server.Game.handle_cast({:add_team, "team_two"}, new_state)
     assert new_new_state.game.teams["team_one"] == team_one
     assert new_new_state.game.teams["team_two"] == team_two
   end
@@ -94,19 +112,41 @@ defmodule Papelito.Server.GameTest do
   test "Add Player" do
     game_state = %GameServer{}
     [player_one, player_two, player_one_b, player_two_b] = ["Marceline", "BMO", "Finn", "Jake"]
-    {:reply, :ok, new_state} = Papelito.Server.Game.handle_call({:add_team, ["team_one", "team_two"]}, nil, game_state)
+    {:noreply, new_state} = Papelito.Server.Game.handle_cast({:add_team, ["team_one", "team_two"]}, game_state)
 
-    {:reply, team_one, new_new_state} = Papelito.Server.Game.handle_call({:add_player, "team_one", player_one}, nil, new_state)
-    assert team_one.players == [player_one]
+    {:noreply, new_new_state} = Papelito.Server.Game.handle_cast({:add_player, "team_one", player_one}, new_state)
+    assert new_new_state.game.teams["team_one"].players == [player_one]
 
-    {:reply, team_one, new_x3_state} = Papelito.Server.Game.handle_call({:add_player, "team_one", player_two}, nil, new_new_state)
-    assert team_one.players == [player_two, player_one]
+    {:noreply, new_x3_state} = Papelito.Server.Game.handle_cast({:add_player, "team_one", player_two}, new_new_state)
+    assert new_x3_state.game.teams["team_one"].players == [player_two, player_one]
 
-    {:reply, team_two, new_x4_state} = Papelito.Server.Game.handle_call({:add_player, "team_two", player_one_b}, nil, new_x3_state)
-    assert team_two.players == [player_one_b]
+    {:noreply, new_x4_state} = Papelito.Server.Game.handle_cast({:add_player, "team_two", player_one_b}, new_x3_state)
+    assert new_x4_state.game.teams["team_two"].players == [player_one_b]
 
-    {:reply, team_two, _new_x5_state} = Papelito.Server.Game.handle_call({:add_player, "team_two", player_two_b}, nil, new_x4_state)
-    assert team_two.players == [player_two_b, player_one_b]
+    {:noreply, new_x5_state} = Papelito.Server.Game.handle_cast({:add_player, "team_two", player_two_b}, new_x4_state)
+    assert new_x5_state.game.teams["team_two"].players == [player_two_b, player_one_b]
+  end
+
+  test "Add point" do
+    team_one = %Team{ name: "team_one", players: [], score: 0}
+    team_two = %Team{ name: "team_two", players: [], score: 0}
+    game_state = %GameServer{}
+
+    {:noreply, new_state} = Papelito.Server.Game.handle_cast({:add_team, "team_one"}, game_state)
+    {:noreply, new_new_state} = Papelito.Server.Game.handle_cast({:add_team, "team_two"}, new_state)
+
+    {:noreply, new_x3_state} = Papelito.Server.Game.handle_cast({:add_point, "team_one"}, new_new_state)
+    assert new_x3_state.game.teams["team_one"].score == 1
+    assert new_x3_state.game.teams["team_two"].score == 0
+
+    {:noreply, new_x4_state} = Papelito.Server.Game.handle_cast({:add_point, "team_one"}, new_x3_state)
+    assert new_x4_state.game.teams["team_one"].score == 2
+    assert new_x4_state.game.teams["team_two"].score == 0
+
+    {:noreply, new_x5_state} = Papelito.Server.Game.handle_cast({:add_point, "team_two"}, new_x4_state)
+    assert new_x5_state.game.teams["team_one"].score == 2
+    assert new_x5_state.game.teams["team_two"].score == 1
+
   end
 
 end
