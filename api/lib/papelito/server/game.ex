@@ -15,17 +15,20 @@ defmodule Papelito.Server.Game do
             current_team: nil,
             teams_order: []
 
+  def start_link([], {game_name_id, subject}) do
+    start_link({game_name_id, subject})
+  end
 
-  def start_link([game_name_id, subject]) do
+  def start_link({game_name_id, subject}) do
     name = via_tuple(game_name_id)
-    GenServer.start_link(__MODULE__, [subject], name: name)
+    GenServer.start_link(__MODULE__, subject, name: name)
   end
 
   defp via_tuple(game_name_id) do
     {:via, Registry, {:game_registry, game_name_id}}
   end
 
-  def init([subject]) do
+  def init(subject) do
     state = %__MODULE__{
       game: GameData.create(subject)
     }
@@ -45,11 +48,11 @@ defmodule Papelito.Server.Game do
   end
 
   def add_team(game_name_id, team_name) do
-    GenServer.call(via_tuple(game_name_id), {:add_team, team_name})
+    GenServer.cast(via_tuple(game_name_id), {:add_team, team_name})
   end
 
   def add_player(game_name_id, team_name, player) do
-    GenServer.call(via_tuple(game_name_id), {:add_player, team_name, player})
+    GenServer.cast(via_tuple(game_name_id), {:add_player, team_name, player})
   end
 
   def add_paper(game_name_id, paper) do
