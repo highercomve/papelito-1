@@ -21,14 +21,14 @@ defmodule Papelito.Server.Game do
 
   def start_link({game_name_id, subject}) do
     name = via_tuple(game_name_id)
-    GenServer.start_link(__MODULE__, subject, name: name)
+    GenServer.start_link(__MODULE__, [subject], name: name)
   end
 
   defp via_tuple(game_name_id) do
     {:via, Registry, {:game_registry, game_name_id}}
   end
 
-  def init(subject) do
+  def init([subject]) do
     state = %__MODULE__{
       game: GameData.create(subject)
     }
