@@ -20,6 +20,16 @@ defmodule Papelito.Supervisor.GameSupervisor do
     DynamicSupervisor.start_child(__MODULE__, child_spec)
   end
 
+  def child_spec(opts) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, [opts]},
+      type: :supervisor,
+      restart: :permanent,
+      shutdown: 20000
+    }
+  end
+
   def end_game(game_pid) do
     DynamicSupervisor.terminate_child(__MODULE__, game_pid)
   end
