@@ -18,6 +18,8 @@ defmodule Papelito do
       supervisor(Papelito.Supervisor.Root, [:ok])
     ]
 
+    # Game persistency
+    Papelito.Storage.setup
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Papelito.Supervisor]
