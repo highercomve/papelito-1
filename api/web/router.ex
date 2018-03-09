@@ -8,6 +8,6 @@ defmodule Papelito.Router do
   scope "/api/v1", Papelito do
     pipe_through :api
 
-    post "/games", GameController, :create
+    resources "/games", GameController, only: [:create, :delete]
   end
 end

@@ -12,4 +12,17 @@ defmodule Papelito.GameControllerTest do
     assert is_pid(Papelito.Server.Game.pid(body["name"]))
   end
 
+  test "#delete Delete/eliminate a game" do
+    name = Haikunator.build
+    args = {name, "Singers"}
+    {:ok, pid} = Papelito.Supervisor.GameSupervisor.start_game(args)
+
+    conn = build_conn()
+    conn = delete conn, game_path(conn, :delete, name)
+    body = json_response(conn, 200)
+    assert body["deleted"] == true
+    assert Process.alive?(pid) == false
+    assert :ets.lookup(:game_table, name) == []
+  end
+
 end
