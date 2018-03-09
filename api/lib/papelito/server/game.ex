@@ -124,7 +124,7 @@ defmodule Papelito.Server.Game do
   end
 
   def terminate({:shutdown, :timeout}, _state) do
-    game_name_from_registry() |> Storage.delete
+    game_name_from_registry() |> Storage.delete_game
     :ok
   end
 
