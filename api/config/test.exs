@@ -9,11 +9,5 @@ config :papelito, Papelito.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-# Configure your database
-config :papelito, Papelito.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "papelito_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+# Configure your database on dev.secret.exs
+import_config "test.secret.exs"

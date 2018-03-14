@@ -85,6 +85,11 @@ defmodule Papelito.Server.Game do
     {:reply, :ok, new_state, @timeout}
   end
 
+  def handle_call(:summary, _from, state) do
+    summary = GamePlay.summary(state)
+    {:reply, summary, state}
+  end
+
   def handle_call(:next_team, _from, state) do
     {current_team, new_state} = GamePlay.next_team(state)
     Storage.save_game(game_name_from_registry(), new_state)

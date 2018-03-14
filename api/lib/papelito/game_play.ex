@@ -89,4 +89,12 @@ defmodule Papelito.GamePlay do
     %__MODULE__{ game_play | game: game }
   end
 
+  @spec summary(GamePlay.t()) :: Struct.t
+  def summary(%GamePlay{} = game_play) do
+    %{
+      game: game_play.game,
+      round: game_play.round
+    }
+  end
+
 end
