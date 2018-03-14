@@ -12,7 +12,7 @@ defmodule Papelito.Model.Game do
 
   @spec create(String.t()) :: Game.t()
   def create(subject) do
-    %Game{ subject: Papelito.Utils.Sanitizer.clean(subject) }
+    %Game{ subject: subject }
   end
 
   @spec add_team(Game.t(), String.t()) :: Game.t()

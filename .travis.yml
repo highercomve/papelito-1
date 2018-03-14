@@ -1,0 +1,14 @@
+language: elixir
+
+matrix:
+  include:
+    - otp_release: 20.1
+      elixir: 1.6.1
+
+sudo: false
+
+before_install:
+- cd $TRAVIS_BUILD_DIR/api
+- cp config/dev.secret.exs.example config/dev.secret.exs
+
+script: mix test --trace
