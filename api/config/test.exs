@@ -9,6 +9,6 @@ config :papelito, Papelito.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
-# Configure your database on dev.secret.exs
+# Configure your database on test.secret.exs
 import_config "test.secret.exs"
 
