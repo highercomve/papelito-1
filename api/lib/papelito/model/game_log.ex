@@ -1,11 +1,11 @@
-defmodule Papelito.GameLog do
+defmodule Papelito.Model.GameLog do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Papelito.GameLog
+  alias __MODULE__
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @derive {Phoenix.Param, key: :id}
-  
+
   schema "game_logs" do
     field :slug, :string
     field :winner, :string
