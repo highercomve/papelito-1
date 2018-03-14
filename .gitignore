@@ -4,4 +4,4 @@
 erl_crash.dump
 *.ez
 *.beam
-/api/config/dev.secret.exs
+/api/config/*.secret.exs
