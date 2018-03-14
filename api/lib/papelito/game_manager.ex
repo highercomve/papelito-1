@@ -9,12 +9,7 @@ defmodule Papelito.GameManager do
   end
 
   def delete_game(game_name) do
-    Papelito.Storage.delete_game(game_name)
-    case Papelito.Server.Game.pid(game_name) do
-      pid when is_pid(pid) ->
-        Papelito.Supervisor.GameSupervisor.end_game(pid)
-      nil ->
-        :ok
-    end
+   Logger.info "Deleting game #{game_name}"
+    Papelito.Server.Game.terminate(game_name)
   end
 end

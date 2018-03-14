@@ -9,7 +9,7 @@ defmodule Papelito.GameController do
   end
 
   def delete(conn, %{"id" => game_name}) do
-    :ok = Papelito.GameManager.delete_game(game_name)
+    :shutdown = Papelito.GameManager.delete_game(game_name)
     conn
     |> put_status(200)
     |> json(%{deleted: true})

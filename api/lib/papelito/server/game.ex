@@ -35,6 +35,14 @@ defmodule Papelito.Server.Game do
     GenServer.call(via_tuple(game_name), :start)
   end
 
+  def terminate(game_name) do
+    send(pid(game_name), :shutdown)
+  end
+
+  def summary(game_name) do
+    GenServer.call(via_tuple(game_name), :summary)
+  end
+
   def next_team(game_name) do
     GenServer.call(via_tuple(game_name), :next_team)
   end
@@ -121,6 +129,15 @@ defmodule Papelito.Server.Game do
 
   def handle_info(:timeout, state) do
     {:stop, {:shutdown, :timeout}, state}
+  end
+
+  def handle_info(:shutdown, state) do
+    {:stop, :normal, state}
+  end
+
+  def terminate(:normal, _state) do
+    game_name_from_registry() |> Storage.delete_game
+    :ok
   end
 
   def terminate({:shutdown, :timeout}, _state) do
